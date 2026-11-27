@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.DS_Store
+# SCC: conda env and all outputs (cache, runs, logs, model downloads) live here, never in git
+/env/
+/work/

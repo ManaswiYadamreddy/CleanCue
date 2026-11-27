@@ -15,11 +15,14 @@ import torch
 
 log = logging.getLogger(__name__)
 
+# Read-only inputs (weights, datasets) live in the old CRAFT area.
 SCC_BASE = "/projectnb/cs599bg/manaswi/craft"
+# The only write area: inside the CleanCue clone, git-ignored.
+HQP_ROOT_DEFAULT = "/projectnb/cs599bg/manaswi/CleanCue/work"
 
 # field name -> (env var, default; "{out_root}" / "{SCC_BASE}" are substituted)
 _SPEC = {
-    "out_root":    ("HQP_ROOT",        "{SCC_BASE}/hqprompt"),
+    "out_root":    ("HQP_ROOT",        HQP_ROOT_DEFAULT),
     "pretrained":  ("HQP_PRETRAINED",  "{SCC_BASE}/ivc_checkpoints/osdface_official/pretrained"),
     "ffhq_hq":     ("HQP_FFHQ_HQ",     "{SCC_BASE}/data/train/images512x512"),
     "ffhq_lq":     ("HQP_FFHQ_LQ",     "{SCC_BASE}/data/train/LQ_images_512x512"),

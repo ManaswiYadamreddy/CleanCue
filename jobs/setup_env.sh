@@ -12,9 +12,9 @@
 # =============================================================================
 set -euo pipefail
 
-ENV_DIR="/projectnb/cs599bg/manaswi/craft/hqprompt/env"
+ENV_DIR="/projectnb/cs599bg/manaswi/CleanCue/env"
 PYTHON_VERSION="3.10"
-BASE="/projectnb/cs599bg/manaswi/craft/hqprompt"
+BASE="/projectnb/cs599bg/manaswi/CleanCue/work"
 # Keep pip / conda caches out of $HOME (writes are only allowed under ${BASE})
 mkdir -p "${BASE}/model_cache/pip" "${BASE}/model_cache/conda_pkgs" "${BASE}/logs"
 export PIP_CACHE_DIR="${BASE}/model_cache/pip"

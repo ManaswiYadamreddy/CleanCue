@@ -15,7 +15,7 @@
 
 This spec is built on `/Users/manaswiyadamreddy/Documents/CleanCue/plan.md` plus the code I read. The coordinator sent updates mid-task and they override plan.md where the two conflict:
 - **No git operations at all.** No branches, commits or git hashes in metadata. Code is edited in place in `/Users/manaswiyadamreddy/Documents/CleanCue/`.
-- **Python env:** a conda prefix env at `/projectnb/cs599bg/manaswi/craft/hqprompt/env`, built by `jobs/setup_env.sh`, which is a port of CRAFT `setup2.sh`.
+- **Python env:** a conda prefix env at `/projectnb/cs599bg/manaswi/CleanCue/env`, built by `jobs/setup_env.sh`, which is a port of CRAFT `setup2.sh`.
 - **How jobs run:** every step must work as plain `bash jobs/<step>.sh` inside a GPU session the user already allocated (qrsh or OnDemand). qsub headers are optional and never name a GPU type.
 - **Data paths on SCC** are now verified (section 1).
 
@@ -877,7 +877,7 @@ Interfaces in sections 1, 2 and 4 are frozen. Coders must not change signatures.
 
 **`jobs/` spec (D):**
 - **`setup_env.sh`**: port of CRAFT `setup2.sh` and `requirements.txt`. Changes from the original:
-  - `ENV_DIR=/projectnb/cs599bg/manaswi/craft/hqprompt/env`.
+  - `ENV_DIR=/projectnb/cs599bg/manaswi/CleanCue/env`.
   - Starts with `module load miniconda`, then `eval "$(conda shell.bash hook)"` before `conda activate "$ENV_DIR"`. A bare `conda activate` fails in a non-interactive bash.
   - Exports `PIP_CACHE_DIR` and `CONDA_PKGS_DIRS` under `hqprompt/` so nothing is written to `$HOME`.
   - `python=3.10`; `torch==2.4.0+cu121` and `torchvision==0.19.0+cu121` from the cu121 index.
@@ -887,8 +887,8 @@ Interfaces in sections 1, 2 and 4 are frozen. Coders must not change signatures.
   - Keeps its import-verification block, plus face_alignment and pytest.
   - Refuses to run if `$ENV_DIR` already exists.
 - **`env.sh`**:
-  - `module load miniconda`, the conda hook, and `conda activate /projectnb/cs599bg/manaswi/craft/hqprompt/env`.
-  - `export HQP_ROOT=/projectnb/cs599bg/manaswi/craft/hqprompt`.
+  - `module load miniconda`, the conda hook, and `conda activate /projectnb/cs599bg/manaswi/CleanCue/env`.
+  - `export HQP_ROOT=/projectnb/cs599bg/manaswi/CleanCue/work`.
   - Caches under `$HQP_ROOT/model_cache`: `HF_HOME`, `TORCH_HOME`, `XDG_CACHE_HOME`, `MPLCONFIGDIR`, `PIP_CACHE_DIR`.
   - `HQP_CODE` defaults to the script's parent directory.
 - **Step scripts:** `check_500.sh`, `infer_official.sh`, `build_cache.sh`, `verify_cache.sh`, `smoke.sh`, `finetune.sh`, `infer.sh`, `evaluate.sh`, `gate.sh`, `train_predictor.sh`, `prefetch_models.sh`.

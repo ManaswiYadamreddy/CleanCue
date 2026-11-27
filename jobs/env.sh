@@ -5,11 +5,11 @@ _hqp_had_u=0; case $- in *u*) _hqp_had_u=1; set +u;; esac
 type module >/dev/null 2>&1 || { [ -f /etc/profile.d/modules.sh ] && . /etc/profile.d/modules.sh; }
 module load miniconda
 eval "$(conda shell.bash hook)"
-conda activate /projectnb/cs599bg/manaswi/craft/hqprompt/env
+conda activate /projectnb/cs599bg/manaswi/CleanCue/env
 [ "$_hqp_had_u" = 1 ] && set -u
 unset _hqp_had_u
 
-export HQP_ROOT="${HQP_ROOT:-/projectnb/cs599bg/manaswi/craft/hqprompt}"
+export HQP_ROOT="${HQP_ROOT:-/projectnb/cs599bg/manaswi/CleanCue/work}"
 # Code checkout = parent of jobs/ unless the caller already set it.
 export HQP_CODE="${HQP_CODE:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 export PYTHONPATH="$HQP_CODE${PYTHONPATH:+:$PYTHONPATH}"

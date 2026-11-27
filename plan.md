@@ -53,7 +53,7 @@ OSDFace (CVPR 2025) is a one-step diffusion face restorer. It prompts SD-2.1 wit
 
 ## 2. Safety rules (must follow)
 
-1. On SCC, **write only inside** `/projectnb/cs599bg/manaswi/craft/hqprompt/` (new folder).
+1. On SCC, **write only inside** `/projectnb/cs599bg/manaswi/CleanCue/work/` (CleanCue clone is `/projectnb/cs599bg/manaswi/CleanCue`; `craft/` is read-only).
 2. Treat everything else as **read-only**, including `ivc_checkpoints/`, `data/` and `code/`.
 3. **Never touch other people's folders** or anything under `/projectnb/cs585`.
 4. Never run GPU or heavy CPU work on the login node. Use batch jobs.
@@ -221,7 +221,7 @@ Script: `hqprompt/infer_official.py`
 
 ### Step 2. Cache (~1 h once [estimate])
 
-Script: `hqprompt/build_cache.py`. Output: `/projectnb/cs599bg/manaswi/craft/hqprompt/cache/`
+Script: `hqprompt/build_cache.py`. Output: `/projectnb/cs599bg/manaswi/CleanCue/work/cache/`
 
 | Item | Images | Size [estimate] |
 |---|---|---|
