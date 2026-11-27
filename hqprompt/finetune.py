@@ -113,7 +113,8 @@ def load_lora_state_dict(unet, sd: dict) -> None:
                        f"unexpected {sorted(set(sd) - expected)[:5]}")
     set_peft_model_state_dict(unet, {k: v.clone() for k, v in sd.items()})
     back = lora_state_dict(unet)
-    bad = [k for k in sd if not torch.equal(back[k], sd[k].to(back[k].dtype))]
+    # Compare on the model's device: the checkpoint tensors come from safetensors on CPU.
+    bad = [k for k in sd if not torch.equal(back[k], sd[k].to(device=back[k].device, dtype=back[k].dtype))]
     if bad:
         raise RuntimeError(f"LoRA load did not round-trip for {len(bad)} tensors, e.g. {bad[:3]}")
 
