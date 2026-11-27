@@ -54,7 +54,7 @@ Steps marked *once* save their results in `work/` and are not rerun unless the r
 |---|---|---|---|
 | env | `bash jobs/setup_env.sh` | once | DONE |
 | pre | `bash jobs/prefetch_models.sh` (GPU session) | once | DONE (rerun once after fixes 6–7 to confirm) |
-| 0 | `bash jobs/check_500.sh` → `work/checks/c1.json`. Exit 2 means C1 failed: STOP. | once | pending |
+| 0 | `bash jobs/check_500.sh` → `work/checks/c1.json`. Exit 2 means C1 failed: STOP. | once | DONE 2026-11-26: C1 PASS, **HQ_INPUT_MODE=single**, mapping pm1, HQ−LQ clean PSNR +1.45 dB [1.24, 1.67]. C3 linear top1 0.361 / top5 0.744 vs baselines 0.010 (global mode), 0.073 (per-position mode), 0.126 (nearest HQ code) |
 | 1 | `bash jobs/infer_official.sh`, plus `PROMPT_VARIANT={shuffled,zero_code,zero_embed}` | once | pending |
 | 2 | `HQ_INPUT_MODE=<c1.json recommended_hq_input_mode> bash jobs/build_cache.sh` (resumable, about 20 GB; run `pquota -u cs599bg` first), then `bash jobs/verify_cache.sh` (must exit 0) | once | pending |
 | 3 | `PROMPT=lq bash jobs/smoke.sh` | once | pending |
@@ -69,7 +69,7 @@ Run directories are named `work/runs/{prompt}_l3d0_s{seed}`. Inference writes to
 - The pyiqa 0.1.12 functions `fid_arch.get_folder_features` and `frechet_distance` exist.
 
 ## Not yet verified
-- C1 assumption: the `vqvae.*` keys are the HQ branch. Step 0 decides this.
+- C1 side observations: on LQ inputs the HQ branch also reconstructs better than the LQ branch (23.1 vs 21.9 dB, `lq_beats_hq=false`). Both branches reconstruct best with single normalization, but the official LQ prompt path keeps its double normalization, because embedding_change and the LoRA were trained with it.
 - Whether the pyiqa FID function signatures match what `metrics/fid.py` calls. This is first exercised in Step 7.
 - Memory use at batch size 2 on an L40S.
 
