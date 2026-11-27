@@ -46,7 +46,7 @@ echo "[3/5] remaining dependencies"
 # torch/torchvision listed again so the resolver keeps 2.4.0 instead of pulling a newer CUDA build
 pip install torch==2.4.0+cu121 torchvision==0.19.0+cu121 \
     --extra-index-url https://download.pytorch.org/whl/cu121 \
-    pillow opencv-python imageio "numpy<2" scipy \
+    "setuptools<70" pillow opencv-python imageio "numpy<2" scipy \
     pyiqa==0.1.12 facexlib lpips "face-alignment>=1.4" scikit-image pytest \
     omegaconf einops ftfy sentencepiece PyYAML tqdm tensorboard
 
@@ -59,6 +59,9 @@ pip install \
     tokenizers==0.15.2 \
     huggingface_hub==0.24.7 \
     safetensors
+
+# pyiqa / openai-clip import pkg_resources, which setuptools>=81 removed
+pip install "setuptools<70"
 
 # Re-pin torch in case anything above upgraded it
 pip install torch==2.4.0+cu121 torchvision==0.19.0+cu121 \
@@ -82,6 +85,7 @@ for name in ["torch", "torchvision", "diffusers", "transformers", "peft", "accel
         ok = False
         print(f"  ✗  {name:<16} FAILED — {e}")
 import math; math.prod  # SCC default python lacked this
+import pkg_resources  # needed by pyiqa; fails if setuptools is too new
 print("All imports OK" if ok else "Some checks FAILED"); sys.exit(0 if ok else 1)
 EOF
 

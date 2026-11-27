@@ -29,3 +29,35 @@ def test_safe_torch_load(tmp_path):
     assert safe_torch_load(p.associate_ckpt, p)["state_dict"]["w"].sum() == 2
     with pytest.raises(PermissionError):
         safe_torch_load(str(tmp_path / "other.pth"), p)
+
+
+def test_safe_torch_load_stubs_lightning_objects(tmp_path):
+    """associate_2.ckpt pickles a pytorch_lightning ModelCheckpoint; load must not need lightning."""
+    import sys
+    import types
+
+    import torch
+
+    mod = types.ModuleType("pytorch_lightning.callbacks.model_checkpoint")
+
+    class ModelCheckpoint:
+        def __init__(self):
+            self.best = 1.0
+
+    ModelCheckpoint.__module__ = mod.__name__
+    ModelCheckpoint.__qualname__ = "ModelCheckpoint"
+    mod.ModelCheckpoint = ModelCheckpoint
+    names = ["pytorch_lightning", "pytorch_lightning.callbacks", mod.__name__]
+    for n in names[:2]:
+        sys.modules[n] = types.ModuleType(n)
+    sys.modules[mod.__name__] = mod
+    p = get_paths(out_root=str(tmp_path / "out"), pretrained=str(tmp_path))
+    try:
+        torch.save({"state_dict": {"w": torch.ones(2)}, "callbacks": {"cb": ModelCheckpoint()}},
+                   p.associate_ckpt)
+    finally:
+        for n in names:
+            del sys.modules[n]
+    out = safe_torch_load(p.associate_ckpt, p)
+    assert out["state_dict"]["w"].sum() == 2
+    assert out["callbacks"]["cb"].best == 1.0

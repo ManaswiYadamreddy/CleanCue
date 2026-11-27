@@ -9,6 +9,7 @@ from __future__ import annotations
 import glob
 import logging
 import os
+import pickle
 from dataclasses import dataclass, fields
 
 import torch
@@ -141,6 +142,38 @@ def assert_writable(path: str, paths: Paths) -> str:
     return rp
 
 
+class _LightningStub:
+    """Placeholder for pytorch_lightning objects pickled inside a .ckpt (callbacks, hparams).
+    Accepts any constructor / setstate call; nothing in hqprompt reads these objects."""
+
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def __setstate__(self, state):
+        if isinstance(state, dict):
+            self.__dict__.update(state)
+
+    def __call__(self, *args, **kwargs):
+        return _LightningStub()
+
+
+_STUB_MODULES = ("pytorch_lightning", "lightning", "lightning_fabric")
+
+
+class _StubUnpickler(pickle.Unpickler):
+    def find_class(self, module, name):
+        if module.split(".")[0] in _STUB_MODULES:
+            return type(name, (_LightningStub,), {"__module__": module})
+        return super().find_class(module, name)
+
+
+class _StubPickleModule:
+    """pickle_module for torch.load: real pickle except Lightning classes become stubs."""
+    Unpickler = _StubUnpickler
+    load = staticmethod(lambda f, **kw: _StubUnpickler(f, **kw).load())
+    __name__ = "hqprompt_stub_pickle"
+
+
 def safe_torch_load(path: str, paths: Paths, map_location="cpu"):
     """torch.load restricted to the two allowlisted pretrained files (plan rule 7)."""
     rp = os.path.realpath(path)
@@ -152,7 +185,9 @@ def safe_torch_load(path: str, paths: Paths, map_location="cpu"):
     except Exception as e:  # Lightning 1.0.8 ckpts may contain non-tensor pickles
         log.warning("weights_only=True failed for %s (%s: %s); retrying weights_only=False "
                     "(file is allowlisted)", rp, type(e).__name__, str(e)[:200])
-        return torch.load(rp, map_location=map_location, weights_only=False)
+        # pytorch_lightning is not installed; its pickled callbacks are replaced by stubs
+        return torch.load(rp, map_location=map_location, weights_only=False,
+                          pickle_module=_StubPickleModule)
 
 
 def file_fingerprint(path: str) -> dict:
