@@ -32,6 +32,8 @@ The old `craft/hqprompt/` folder is no longer used.
 3. `pyiqa` raised `No module named 'pkg_resources'` because setuptools 84 removed it. Fix: `pip install "setuptools<70"`. This is now pinned in `setup_env.sh`.
 4. `basicsr` breaks with torchvision 0.19 and is unused, so it was removed. `xformers` is not used.
 5. `associate_2.ckpt` pickles a `pytorch_lightning.callbacks.ModelCheckpoint`, so loading it raised `No module named 'pytorch_lightning'`. Fix: `paths.safe_torch_load` falls back to a pickle module that turns any `pytorch_lightning`/`lightning` class into a placeholder stub. Do NOT install pytorch_lightning, because it can move torch.
+6. pyiqa, openai-clip and face_alignment hard-code `~/.cache`, so prefetch first wrote about 1 GB to `/usr3/graduate/manaswiy/.cache`. Fix: `env.sh` exports `HQP_HOME_CACHE=work/model_cache/home`, and `hqprompt/__init__.py` sets `HOME` to it inside Python processes only. The files were moved there.
+7. face_alignment 1.5's `torch.compile` fails with the old SCC g++ (`[[unlikely]]` errors) and falls back to eager. Fix: `FaceAlignment(..., compile=False)`, with face-alignment pinned to 1.5.0.
 
 ## Every new shell or session on SCC
 ```bash
@@ -51,7 +53,7 @@ Steps marked *once* save their results in `work/` and are not rerun unless the r
 | # | Command | Once? | Status |
 |---|---|---|---|
 | env | `bash jobs/setup_env.sh` | once | DONE |
-| pre | `bash jobs/prefetch_models.sh` (GPU session) | once | pending |
+| pre | `bash jobs/prefetch_models.sh` (GPU session) | once | DONE (rerun once after fixes 6–7 to confirm) |
 | 0 | `bash jobs/check_500.sh` → `work/checks/c1.json`. Exit 2 means C1 failed: STOP. | once | pending |
 | 1 | `bash jobs/infer_official.sh`, plus `PROMPT_VARIANT={shuffled,zero_code,zero_embed}` | once | pending |
 | 2 | `HQ_INPUT_MODE=<c1.json recommended_hq_input_mode> bash jobs/build_cache.sh` (resumable, about 20 GB; run `pquota -u cs599bg` first), then `bash jobs/verify_cache.sh` (must exit 0) | once | pending |
@@ -61,10 +63,14 @@ Steps marked *once* save their results in `work/` and are not rerun unless the r
 
 Run directories are named `work/runs/{prompt}_l3d0_s{seed}`. Inference writes to `{run_dir}/outputs/step_N/{codes}/{dataset}/images`.
 
-## Not yet verified on real data
-- That `associate_2.ckpt` loads, with the expected key prefixes and without needing pytorch_lightning (`vre.load_branch`).
-- C1 assumption: the `vqvae.*` keys are the HQ branch.
-- That the pyiqa 0.1.12 functions `fid_arch.get_folder_features` and `frechet_distance` exist with the signatures `metrics/fid.py` expects.
+## Verified on SCC (2026-11-26)
+- `associate_2.ckpt`: the hq and lq branches both strict-load with their decoders, and each codebook is (1024, 512).
+- The official LoRA merge gives 278 pairs (64 conv, 214 linear) at rank 16, with nothing unprocessed.
+- The pyiqa 0.1.12 functions `fid_arch.get_folder_features` and `frechet_distance` exist.
+
+## Not yet verified
+- C1 assumption: the `vqvae.*` keys are the HQ branch. Step 0 decides this.
+- Whether the pyiqa FID function signatures match what `metrics/fid.py` calls. This is first exercised in Step 7.
 - Memory use at batch size 2 on an L40S.
 
 ## Local testing (Mac)

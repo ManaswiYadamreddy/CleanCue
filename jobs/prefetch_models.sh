@@ -30,6 +30,6 @@ from facexlib.recognition import init_recognition_model
 init_recognition_model("arcface", device=torch.device("cpu"), model_rootpath=paths.facexlib_dir)
 print("ok facexlib arcface", flush=True)
 import face_alignment
-face_alignment.FaceAlignment(face_alignment.LandmarksType.TWO_D, device="cpu", flip_input=False)
+face_alignment.FaceAlignment(face_alignment.LandmarksType.TWO_D, device="cpu", flip_input=False, compile=False)
 print("ok face_alignment", flush=True)
 PY

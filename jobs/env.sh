@@ -29,9 +29,11 @@ export HQP_MODEL_CACHE="${HQP_MODEL_CACHE:-$HQP_ROOT/model_cache}"
 export HF_HOME="$HQP_MODEL_CACHE/hf"
 export TORCH_HOME="$HQP_MODEL_CACHE/torch"
 export XDG_CACHE_HOME="$HQP_MODEL_CACHE/xdg"
+# Python-only HOME for libs that hard-code ~/.cache (pyiqa, clip, face_alignment); see hqprompt/__init__.py
+export HQP_HOME_CACHE="$HQP_MODEL_CACHE/home"
 export MPLCONFIGDIR="$HQP_MODEL_CACHE/mpl"
 export PIP_CACHE_DIR="$HQP_MODEL_CACHE/pip"
 export PYTHONNOUSERSITE=1
 export PYTHONDONTWRITEBYTECODE=1
 export CUDA_CACHE_PATH="$HQP_MODEL_CACHE/nv"
-mkdir -p "$CUDA_CACHE_PATH" "$HF_HOME" "$TORCH_HOME" "$XDG_CACHE_HOME" "$MPLCONFIGDIR" "$PIP_CACHE_DIR" "$HQP_ROOT/logs"
+mkdir -p "$CUDA_CACHE_PATH" "$HF_HOME" "$TORCH_HOME" "$XDG_CACHE_HOME" "$MPLCONFIGDIR" "$PIP_CACHE_DIR" "$HQP_HOME_CACHE" "$HQP_ROOT/logs"

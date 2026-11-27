@@ -47,7 +47,7 @@ echo "[3/5] remaining dependencies"
 pip install torch==2.4.0+cu121 torchvision==0.19.0+cu121 \
     --extra-index-url https://download.pytorch.org/whl/cu121 \
     "setuptools<70" pillow opencv-python imageio "numpy<2" scipy \
-    pyiqa==0.1.12 facexlib lpips "face-alignment>=1.4" scikit-image pytest \
+    pyiqa==0.1.12 facexlib lpips face-alignment==1.5.0 scikit-image pytest \
     omegaconf einops ftfy sentencepiece PyYAML tqdm tensorboard
 
 echo "[4/5] pinned core (installed after pyiqa so its deps cannot move them)"

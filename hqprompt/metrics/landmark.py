@@ -12,7 +12,8 @@ class LandmarkDistance:
 
         self.device = torch.device(device)
         self.fa = face_alignment.FaceAlignment(
-            face_alignment.LandmarksType.TWO_D, device=str(self.device), flip_input=False)
+            face_alignment.LandmarksType.TWO_D, device=str(self.device), flip_input=False,
+            compile=False)  # torch.compile fails with SCC g++ (no C++17 attributes)
 
     def _landmarks(self, img_uint8_hwc: np.ndarray):
         """(68,2) float32 of the largest detected face, or None."""
